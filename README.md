@@ -1,32 +1,28 @@
 # cookie_shipper
 
-Ships browser cookies from the user's Windows workstation to `~/cookie_shipper` on the ChupTV
-server, over Tailscale. yt-dlp on the server then uses them for YouTube downloads (the
-viewing-list ingest in `~/chuptv_director`: `chuptv ingest download --cookies <file>`).
+Keeps a yt-dlp server supplied with fresh YouTube cookies from a Windows workstation's browser.
+The cookies go over SSH on a private Tailscale network.
 
-The Tailscale IP, SSH login, and the cookies themselves only ever live in gitignored files
-(`secrets.*`, `.env`/`*.env`, `*cookies*.txt`) -- never in this repo or its history.
+- **Shipper** (workstation): a Brave extension exports the YouTube/Google cookies, and a
+  scheduled PowerShell script validates them and sends them every 30 minutes, only while you're
+  logged in. See [SHIPPER.md](SHIPPER.md).
+- **Receiver** (server): no code. The file lands at `~/cookie_shipper/youtube_cookies.txt`, and
+  yt-dlp reads it with `--cookies`. See [RECEIVER.md](RECEIVER.md) for the contract.
 
-## Status
+If the workstation is off, nothing ships and nothing retries. The server just keeps the last
+file it got.
 
-Both sides are built and running:
+## Secrets
 
-- **Receiver** (server side): no code, see [RECEIVER.md](RECEIVER.md) for the contract.
-- **Shipper** (workstation side): a Brave extension + a scheduled PowerShell script, see
-  [SHIPPER.md](SHIPPER.md).
+The server address, SSH login and cookies are kept only in gitignored files (`secrets.*`,
+`.env`/`*.env`, `*cookies*.txt`) and never in this repo.
 
-## Decisions (2026-11-15)
+## Design notes
 
-- **No throwaway Google account.** It's too much trouble. The cookies come from the user's own
-  browser session.
-- **Downloads are staggered** to protect that account. YouTube gets no burst of hundreds of
-  downloads: the downloader spaces them out with random pauses and a daily cap. That work lives in
-  `~/chuptv_director`, not here.
-- **Build order:**
-  1. The **receiver**, on the server, in this repo (a separate Claude Code session).
-  2. The **shipper**, on the workstation (Claude Code there).
-- **The cookie file** lands in `~/cookie_shipper/` on the server. It is gitignored (`*cookies*.txt`),
-  like the secrets file.
-- **Brave can't use `yt-dlp --cookies-from-browser`** (app-bound encryption blocks it, same as
-  Chrome/Edge), so the shipper reads cookies through a small browser extension instead. See
-  SHIPPER.md for why.
+- **Brave, Chrome and Edge can't use `yt-dlp --cookies-from-browser` on Windows**, because
+  app-bound encryption blocks it. That's why the shipper uses a small extension that reads
+  cookies through the `chrome.cookies` API.
+- **The cookies come from your own Google account.** There's no throwaway account. To protect
+  it, the downloader should space out downloads with random pauses and a daily cap.
+- **The downloader should pass yt-dlp a temp copy of the cookie file**, because yt-dlp writes
+  cookies back on exit (see RECEIVER.md).

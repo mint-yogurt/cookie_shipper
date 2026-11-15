@@ -59,10 +59,10 @@ Every send then uses `ssh -i $env:USERPROFILE\.ssh\cookie_shipper ...`.
 - YouTube rotates session cookies while you keep using the browser. Each export is fresh, but older
   exports go stale. Shipping on a timer covers that.
 
-## Notes for the consumer (`~/chuptv_director`)
+## Notes for the consumer (the downloader)
 
-- `chuptv ingest download --cookies ~/cookie_shipper/youtube_cookies.txt`
+- `yt-dlp --cookies ~/cookie_shipper/youtube_cookies.txt ...`
 - yt-dlp **writes the cookie file back** when it exits. Suppose a download is running while a new
   file arrives: when the download exits, yt-dlp writes back the cookies it loaded at the start, over
-  the fresh file. To avoid that, chuptv should copy the file to a temp path for each run and pass
+  the fresh file. To avoid that, the downloader should copy the file to a temp path for each run and pass
   the copy.
