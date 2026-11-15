@@ -1,10 +1,19 @@
 # cookie_shipper
 
-Intention: ship browser cookies from the user's workstation to `~/cookie_shipper` on the ChupTV
-server (`mintyogurt`), over Tailscale. yt-dlp on the server then uses them for YouTube downloads
-(the viewing-list ingest in `~/chuptv_director`: `chuptv ingest download --cookies <file>`).
+Ships browser cookies from the user's Windows workstation to `~/cookie_shipper` on the ChupTV
+server, over Tailscale. yt-dlp on the server then uses them for YouTube downloads (the
+viewing-list ingest in `~/chuptv_director`: `chuptv ingest download --cookies <file>`).
 
-The Tailscale IP and ports go in a secrets file that isn't committed to the GitHub repo.
+The Tailscale IP, SSH login, and the cookies themselves only ever live in gitignored files
+(`secrets.*`, `.env`/`*.env`, `*cookies*.txt`) -- never in this repo or its history.
+
+## Status
+
+Both sides are built and running:
+
+- **Receiver** (server side): no code, see [RECEIVER.md](RECEIVER.md) for the contract.
+- **Shipper** (workstation side): a Brave extension + a scheduled PowerShell script, see
+  [SHIPPER.md](SHIPPER.md).
 
 ## Decisions (2026-11-15)
 
@@ -18,3 +27,6 @@ The Tailscale IP and ports go in a secrets file that isn't committed to the GitH
   2. The **shipper**, on the workstation (Claude Code there).
 - **The cookie file** lands in `~/cookie_shipper/` on the server. It is gitignored (`*cookies*.txt`),
   like the secrets file.
+- **Brave can't use `yt-dlp --cookies-from-browser`** (app-bound encryption blocks it, same as
+  Chrome/Edge), so the shipper reads cookies through a small browser extension instead. See
+  SHIPPER.md for why.

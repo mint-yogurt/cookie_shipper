@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Cookie Shipper Export",
+  "version": "1.0",
+  "description": "Periodically exports .youtube.com and .google.com cookies to a Netscape cookie file for cookie_shipper.",
+  "permissions": ["cookies", "downloads", "alarms"],
+  "host_permissions": ["https://*.youtube.com/*", "https://*.google.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

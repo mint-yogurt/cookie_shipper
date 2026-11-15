@@ -4,3 +4,5 @@ secrets.*
 *.env
 # Cookies themselves
 *cookies*.txt
+# Shipper run log
+*.log
