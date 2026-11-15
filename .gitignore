@@ -1,0 +1,6 @@
+# Secrets: Tailscale IP, ports, any keys. Never commit.
+secrets.*
+.env
+*.env
+# Cookies themselves
+*cookies*.txt
