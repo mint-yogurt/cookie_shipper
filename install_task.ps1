@@ -5,8 +5,8 @@
 $here = $PSScriptRoot
 $taskName = "CookieShipper"
 
-$action = New-ScheduledTaskAction -Execute "powershell.exe" `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$here\ship.ps1`"" `
+$action = New-ScheduledTaskAction -Execute "wscript.exe" `
+    -Argument "`"$here\run_hidden.vbs`"" `
     -WorkingDirectory $here
 
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) `
